@@ -40,9 +40,7 @@
         <exclude name="ExcessivePublicCount"/>
         <exclude name="FieldDeclarationsShouldBeAtStartOfClass"/>
         <exclude name="GodClass"/>
-        <exclude name="GuardDebugLogging"/>
         <exclude name="GuardLogStatement"/>
-        <exclude name="GuardLogStatementJavaUtil"/>
         <exclude name="ImmutableField"/>
         <exclude name="LawOfDemeter"/>
         <exclude name="LocalVariableCouldBeFinal"/>
@@ -73,7 +71,7 @@
         <exclude name="UnusedPrivateMethod"/>
         <exclude name="UnnecessaryConstructor"/>
         <exclude name="UnnecessaryLocalBeforeReturn"/>
-        <exclude name="UnnecessaryParentheses"/>
+        <exclude name="UselessParentheses"/>
         <exclude name="UseConcurrentHashMap"/>
         <exclude name="UseCorrectExceptionLogging"/>
         <exclude name="UseIndexOfChar"/>
@@ -84,7 +82,7 @@
         <exclude name="UseVarargs"/>
 
     </rule>
-    <rule ref="rulesets/java/empty.xml/EmptyCatchBlock">
+    <rule ref="category/java/errorprone.xml/EmptyCatchBlock">
         <properties>
             <property name="allowCommentedBlocks" value="true"/>
         </properties>
