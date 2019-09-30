@@ -37,11 +37,6 @@ public class SCMHttpRestClient {
     if (StringUtils.isEmpty(userId) || StringUtils.isEmpty(password)) {
       id = settings.getUsername();
       secret = settings.getPassword();
-        try {
-            secret = Encryption.decryptString(secret, settings.getKey());
-        } catch (EncryptionException e) {
-            LOG.error(e.getMessage());
-        }
     }
     // Basic Auth only.
     if (!"".equals(id) && !"".equals(secret)) {
