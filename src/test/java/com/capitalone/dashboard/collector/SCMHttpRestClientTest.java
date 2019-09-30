@@ -89,7 +89,7 @@ public class SCMHttpRestClientTest {
                 .willReturn(responseEntity);
 
         given(settings.getKey()).willReturn("WI9XFb8cW9bxeS/fwdka0LBXFbqtwvEa");
-        given(settings.getPassword()).willReturn("GASWrg0aNQAbMu0LxTjAhg==");
+        given(settings.getPassword()).willReturn("password");
         given(settings.getUsername()).willReturn("user");
 
         //when
