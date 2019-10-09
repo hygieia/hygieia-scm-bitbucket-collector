@@ -10,6 +10,7 @@ import com.capitalone.dashboard.repository.BaseCollectorRepository;
 import com.capitalone.dashboard.repository.CommitRepository;
 import com.capitalone.dashboard.repository.ComponentRepository;
 import com.capitalone.dashboard.repository.GitRepoRepository;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bson.types.ObjectId;
@@ -148,50 +149,74 @@ public class GitCollectorTask extends CollectorTask<Collector> {
         int pullCount = 0;
 
         clean(collector);
-        for (GitRepo repo : enabledRepos(collector)) {
-            boolean firstRun = false;
-            if (repo.getLastUpdateTime() == null) firstRun = true;
-            LOG.debug(repo.getOptions().toString() + "::" + repo.getBranch());
+        for (int i = 0; i < gitSettings.getHost().size(); i++) {
 
-            List<Commit> commits = gitClient.getCommits(repo, firstRun);
-            List<Commit> newCommits = new ArrayList<>();
-            for (Commit commit : commits) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(commit.getTimestamp() + ":::" + commit
-                            .getScmCommitLog());
-                }
+            String host = gitSettings.getHost().get(i);
+            LOG.debug("Settings URL :" + host);
+            String userName = gitSettings.getUsername().get(i);
+            String password = new String(Base64.decodeBase64(gitSettings.getPassword().get(i)));
 
-                if (isNewCommit(repo, commit)) {
-                    commit.setCollectorItemId(repo.getId());
-                    newCommits.add(commit);
+            for (GitRepo repo : enabledRepos(collector)) {
+                boolean firstRun = false;
+                LOG.debug("CollectorItem ID : " +repo.getId());
+                if (repo.getLastUpdateTime() == null) firstRun = true;
+                String url = repo.getRepoUrl();
+                String repoURL = getUrlDomainName(url);
+                if (repoURL.equalsIgnoreCase(host)) {
+                    LOG.debug("REPO URL : "+repoURL);
+                    LOG.debug(repo.getOptions().toString() + "::" + repo.getBranch());
+                    List<Commit> commits = gitClient.getCommits(repo, firstRun, userName, password);
+                    List<Commit> newCommits = new ArrayList<>();
+                    for (Commit commit : commits) {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug(commit.getTimestamp() + ":::" + commit
+                                    .getScmCommitLog());
+
+                        }
+                        if (isNewCommit(repo, commit)) {
+                            commit.setCollectorItemId(repo.getId());
+                            newCommits.add(commit);
+                        }
+                    }
+                    commitRepository.save(newCommits);
+                    commitCount += newCommits.size();
+
+
+                    if (!commits.isEmpty()) {
+                        // It appears that the first commit in the list is the HEAD of the branch
+                        repo.setLastUpdateCommit(commits.get(0).getScmRevisionNumber());
+                    }
+
+                    // Step 2: Get all the Pull Requests
+                    LOG.info(repo.getOptions().toString() + "::" + repo
+                            .getBranch() + "::get pulls");
+
+                    pullCount += pullRequestCollector.getPullRequests(repo, "all", userName, password);
+                    long time = System.currentTimeMillis();
+                    repo.setLastUpdateTime(time);
+                    try {
+                        gitRepoRepository.save(repo);
+                    } catch (ClassCastException e) {
+                        LOG.info("Class Cast Exception:", e);
+                    }
+                    repoCount++;
                 }
             }
-            commitRepository.save(newCommits);
-            commitCount += newCommits.size();
-
-
-            if (!commits.isEmpty()) {
-                // It appears that the first commit in the list is the HEAD of the branch
-                repo.setLastUpdateCommit(commits.get(0).getScmRevisionNumber());
-            }
-
-            // Step 2: Get all the Pull Requests
-            LOG.info(repo.getOptions().toString() + "::" + repo
-                    .getBranch() + "::get pulls");
-
-            pullCount += pullRequestCollector.getPullRequests(repo, "all");
-
-            repo.setLastUpdateTime(System.currentTimeMillis());
-            gitRepoRepository.save(repo);
-
-            repoCount++;
+            log("Repo Count", start, repoCount);
+            log("New Commits", start, commitCount);
         }
-        log("Repo Count", start, repoCount);
-        log("New Commits", start, commitCount);
 
         log("Finished", start);
     }
 
+    @SuppressWarnings("unused")
+    private Long lastUpdated(GitRepo repo) {
+        return repo.getLastUpdateTime();
+    }
+    /*@SuppressWarnings("unused")
+    private Date lastUpdated(GitRepo repo) {
+        return repo.getLastUpdateTime();
+    }*/
     private List<GitRepo> enabledRepos(Collector collector) {
         return gitRepoRepository.findEnabledGitRepos(collector.getId());
     }
@@ -199,6 +224,24 @@ public class GitCollectorTask extends CollectorTask<Collector> {
     private boolean isNewCommit(GitRepo repo, Commit commit) {
         return commitRepository.findByCollectorItemIdAndScmRevisionNumber(
                 repo.getId(), commit.getScmRevisionNumber()) == null;
+    }
+
+    private String getUrlDomainName(String url) {
+        String domainName = url;
+        String domain = null;
+        int index = domainName.indexOf("://");
+        if (index != -1) {
+            domain = domainName.substring(0,index + 3);
+            domainName = domainName.substring(index + 3);
+        }
+        index = domainName.indexOf('/');
+
+        if (index != -1) {
+            domainName = domainName.substring(0, index);
+        }
+        domainName = domain + domainName;
+        domainName = domainName.replaceFirst("^www.*?\\.", "");
+        return domainName;
     }
 }
 

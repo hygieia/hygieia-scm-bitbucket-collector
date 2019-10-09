@@ -69,7 +69,7 @@ public class DefaultBitbucketCloudClient implements GitClient {
 
 	@Override
 	@SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.NPathComplexity"}) // agreed, fixme
-	public List<Commit> getCommits(GitRepo repo, boolean firstRun) {
+	public List<Commit> getCommits(GitRepo repo, boolean firstRun, String userName, String password) {
 
 		List<Commit> commits = new ArrayList<>();
 
@@ -92,11 +92,14 @@ public class DefaultBitbucketCloudClient implements GitClient {
 		String hostUrl = protocol + "://" + hostName + "/";
 		String repoName = repoUrl.substring(hostUrl.length(), repoUrl.length());
 		String apiUrl = "";
-		if (hostName.startsWith(settings.getHost())) {
-			apiUrl = protocol + "://" + settings.getHost() + repoName;
-		} else {
-			apiUrl = protocol + "://" + hostName + settings.getApi() + repoName;
-			LOG.debug("API URL IS:"+apiUrl);
+		for (int i = 0; i < settings.getHost().size(); i++) {
+			String host = settings.getHost().get(i);
+			if (hostName.startsWith(host)) {
+				apiUrl = protocol + "://" + host + repoName;
+			} else {
+				apiUrl = protocol + "://" + hostName + settings.getApi() + repoName;
+				LOG.debug("API URL IS:" + apiUrl);
+			}
 		}
 		Date dt;
 		if (firstRun) {
@@ -123,22 +126,27 @@ public class DefaultBitbucketCloudClient implements GitClient {
 		 * cal.add(Calendar.DATE, -30); Date dateBefore30Days = cal.getTime();
 		 */
 
-		// decrypt password
+//		 decrypt password
+		String repoUser = "";
 		String decryptedPassword = "";
 		if (repo.getPassword() != null && !repo.getPassword().isEmpty()) {
 			try {
+				repoUser = repo.getUserId();
 				decryptedPassword = Encryption.decryptString(
 						repo.getPassword(), settings.getKey());
 			} catch (EncryptionException e) {
 				LOG.error(e.getMessage());
 			}
+		} else {
+			repoUser = userName;
+			decryptedPassword = password;
 		}
 		boolean lastPage = false;
 		int pageNumber = 1;
 		String queryUrlPage = queryUrl;
 		while (!lastPage) {
 			try {
-				ResponseEntity<String> response = makeRestCall(queryUrlPage, repo.getUserId(), decryptedPassword);
+				ResponseEntity<String> response = makeRestCall(queryUrlPage, repoUser, decryptedPassword);
 				JSONObject jsonParentObject = paresAsObject(response);
 				JSONArray jsonArray = (JSONArray) jsonParentObject.get("values");
 
