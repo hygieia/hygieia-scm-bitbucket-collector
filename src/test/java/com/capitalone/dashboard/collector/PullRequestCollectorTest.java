@@ -54,15 +54,9 @@ public class PullRequestCollectorTest {
 
     @Test
     public void testGetPullRequests() throws IOException, URISyntaxException, EncryptionException {
-        //given(settings.getKey()).willReturn("abcdefghijklmnopqrstuvwxyz1234567");
-        //String encPassword = Encryption.encryptString("password", settings.getKey());
-//        String encPassword = new String(Base64.decodeBase64(settings.getPassword()));
-//        given(settings.getPassword()).willReturn(encPassword);
-        // given
         String prResponseTestData = getJson("/bitbucket-server/pr-response-test-data-1.json");
         GitRepo repo = new GitRepo();
         repo.setUserId("user");
-//        repo.setPassword(encPassword);
         String repoUrl = "https://username@company.com/scm/myproject/myrepository.git";
         repo.setRepoUrl(repoUrl);
         repo.getOptions().put("url", repoUrl);
@@ -106,15 +100,9 @@ public class PullRequestCollectorTest {
 
     @Test
     public void testGetPullRequests_RecentlyUpdated() throws IOException, URISyntaxException, Exception {
-//        given(settings.getKey()).willReturn("abcdefghijklmnopqrstuvwxyz1234567");
-//        String encPassword = Encryption.encryptString("password", settings.getKey());
-//        String encPassword = new String(Base64.decodeBase64(settings.getPassword()));
-//        given(settings.getPassword()).willReturn(encPassword);
-        // given
         String prResponseTestData = getJson("/bitbucket-server/pr-response-test-data-1.json");
         GitRepo repo = new GitRepo();
         repo.setUserId("user");
-//        repo.setPassword(encPassword);
         String repoUrl = "https://username@company.com/scm/myproject/myrepository.git";
         repo.setRepoUrl(repoUrl);
         repo.getOptions().put("url", repoUrl);

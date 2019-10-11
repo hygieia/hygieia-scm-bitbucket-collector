@@ -59,7 +59,6 @@ public class PullRequestCollector {
      * @param status            open/merged
      *
      * @return
-     * @throws Exception
      */
     @SuppressWarnings("PMD.NPathComplexity")
     public int getPullRequests(GitRepo repo, String status, String userName, String password) {

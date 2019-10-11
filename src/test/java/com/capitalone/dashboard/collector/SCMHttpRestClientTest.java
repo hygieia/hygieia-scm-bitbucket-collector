@@ -88,10 +88,6 @@ public class SCMHttpRestClientTest {
                 classArgumentCaptor.capture()))
                 .willReturn(responseEntity);
 
-//        given(settings.getKey()).willReturn("WI9XFb8cW9bxeS/fwdka0LBXFbqtwvEa");
-//        given(settings.getPassword()).willReturn("GASWrg0aNQAbMu0LxTjAhg==");
-//        given(settings.getUsername()).willReturn("user");
-
         //when
         ResponseEntity<String> stringResponseEntity = scmHttpRestClient
                 .makeRestCall(uri, "abcdefgh","dXNlcjpwYXNzd29yZA==");

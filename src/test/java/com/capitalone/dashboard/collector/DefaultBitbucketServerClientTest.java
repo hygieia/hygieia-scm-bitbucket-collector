@@ -127,16 +127,11 @@ public class DefaultBitbucketServerClientTest {
     public void testCommits() throws Exception, URISyntaxException {
         // Note that there always is paging even if results only take 1 page
         String jsonResponse1 = "{ \"values\": [] }";
-       // settings.setKey("abcdefghijklmnopqrstuvwxyz1234567");
-        //String encPassword = Encryption.encryptString("password", settings.getKey());
-        //String encPassword = "cGFzc3dvcmQ=";
-
 
         settings.setPageSize(1);
 
         GitRepo repo = new GitRepo();
         repo.setUserId("user");
-        //repo.setPassword(encPassword);
 
         String repoUrl = "https://username@company.com/scm/myproject/myrepository.git";
         repo.setRepoUrl(repoUrl);

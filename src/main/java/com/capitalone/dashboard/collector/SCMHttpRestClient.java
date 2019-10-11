@@ -33,17 +33,8 @@ public class SCMHttpRestClient {
         if (LOG.isDebugEnabled()) {
             LOG.debug("GET " + uri);
         }
-        // fallback to global credentials
-        /*if (StringUtils.isEmpty(userId) || StringUtils.isEmpty(password)) {
-            id = settings.getUsername();
-            try {
-                secret = new String(Base64.decodeBase64(settings.getPassword()));
-            } catch (Exception e) {
-                LOG.error(e.getMessage());
-            }
-        }*/
         // Basic Auth only.
-        if (!"".equals(id) && !"".equals(secret)) {
+        if (StringUtils.isNotEmpty(id) && StringUtils.isNotEmpty(secret)) {
             return restTemplate.exchange(
                     uri, HttpMethod.GET, new HttpEntity<>(createHeaders(id, secret)), String.class);
 
