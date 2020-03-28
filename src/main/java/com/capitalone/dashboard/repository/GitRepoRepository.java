@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface GitRepoRepository extends BaseCollectorItemRepository<GitRepo> {
 
-    @Query(value="{ 'collectorId' : ?0, options.repoUrl : ?1, options.branch : ?2}")
+    @Query(value="{ 'collectorId' : ?0, options.url : ?1, options.branch : ?2}")
     GitRepo findGitRepo(ObjectId collectorId, String url, String branch);
 
     @Query(value="{ 'collectorId' : ?0, enabled: true}")
