@@ -17,6 +17,7 @@ public class GitSettings {
     private int firstRunHistoryDays;
     private String api;
     private int pageSize;
+    private String product;
     private List<String> username;
     private List<String> password;
 
@@ -68,6 +69,14 @@ public class GitSettings {
 		this.pageSize = pageSize;
 	}
 
+	public String getProduct() {
+		return product;
+	}
+
+	public void setProduct(String product) {
+		this.product = product;
+	}
+	
     public List<String> getUsername() {
         return username;
     }
