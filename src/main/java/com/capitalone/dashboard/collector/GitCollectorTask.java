@@ -162,8 +162,10 @@ public class GitCollectorTask extends CollectorTask<Collector> {
                 if (repo.getLastUpdateTime() == null) firstRun = true;
                 String url = repo.getRepoUrl();
                 String repoURL = getUrlDomainName(url);
-                if (repoURL.equalsIgnoreCase(host)) {
+                // repoUrl not always matches with settings Host
+                //if (repoURL.equalsIgnoreCase(host)) {
                     LOG.debug("REPO URL : "+repoURL);
+                    LOG.debug("HOST URL : "+host);
                     LOG.debug(repo.getOptions().toString() + "::" + repo.getBranch());
                     List<Commit> commits = gitClient.getCommits(repo, firstRun, userName, password);
                     List<Commit> newCommits = new ArrayList<>();
@@ -200,7 +202,7 @@ public class GitCollectorTask extends CollectorTask<Collector> {
                         LOG.info("Class Cast Exception:", e);
                     }
                     repoCount++;
-                }
+                //}
             }
             log("Repo Count", start, repoCount);
             log("New Commits", start, commitCount);
